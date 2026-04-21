@@ -59,8 +59,7 @@ Escriba un programa en Python que genere de manera aleatoria una lista de 1 mill
 tres valores mencionados.
 Programe dos versiones de la solución:
 
-- Versión secuencial: recorre la lista completa y calcula el índice de cada 
-registro.
+- Versión secuencial: recorre la lista completa y calcula el índice de cada registro.
 
 - Versión paralela: divida la lista en 4 sublistas y use multiprocessing para que 4 procesos trabajen en paralelo 
 sobre cada sublista.
