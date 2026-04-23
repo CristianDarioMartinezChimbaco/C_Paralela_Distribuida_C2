@@ -4,7 +4,7 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT OUTPUT-DATA-IND ASSIGN TO 'datos.txt'.
+           SELECT OUTPUT-DATA-IND ASSIGN TO FILE-DATA.
         
        DATA DIVISION.
        FILE SECTION.
@@ -20,13 +20,13 @@
        01 NUM-RAND         PIC 99V99.
         
        01 WS-OUT-DATA-REC.
-           02 FILLER1      PIC X(12) VALUE 'TEMPERATURA '.
+           02 FILLER       PIC X(12) VALUE 'TEMPERATURE '.
            02 TEMPERATURE  PIC 99V99 VALUE ZEROS.
-           02 FILLER2      PIC X(09) VALUE ' HUMEDAD '.
+           02 FILLER       PIC X(10) VALUE ' HUMIDITY '.
            02 HUMIDITY     PIC 99V99 VALUE ZEROS.
-           02 FILLER3      PIC X(05) VALUE ' CO2 '.
+           02 FILLER       PIC X(05) VALUE ' CO2 '.
            02 CO2          PIC 9(03) VALUE ZEROS.
-           02 FILLER4      PIC X(08) VALUE ' INDICE '.
+           02 FILLER       PIC X(07) VALUE ' INDEX '.
            02 INDEX-NUM    PIC 99V99 VALUE ZEROS.
         
        PROCEDURE DIVISION.

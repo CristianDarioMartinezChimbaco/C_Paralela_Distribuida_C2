@@ -8,20 +8,20 @@ using namespace std;
 using namespace chrono;
 void crearDatosCobol(string name){
         auto inicio = high_resolution_clock::now();
-        string comando = "cobc -x CREAR-DATOS" + name + ".cob -o CREAR-DATOS" + name;
+        string comando = "cobc -x " + name + ".cob -o " + name;
         system(comando.c_str());
-        comando = "./CREAR-DATOS" + name; 
+        comando = "./" + name; 
         system(comando.c_str());
-        cout << "finalizo CREAR-DATOS" << name << endl;
+        cout << "finalizo " << name << endl;
     auto fin = high_resolution_clock::now();
     auto duracion = duration_cast<milliseconds>(fin - inicio);
     cout << "Tiempo: " << duracion.count() << " ms" << endl;
 }
 void leerDatosCobol(string name){
     auto inicio = high_resolution_clock::now();
-        string comando = "cobc -x LEER-DATOS" + name + ".cob -o LEER-DATOS" + name;
+        string comando = "cobc -x " + name + ".cob -o " + name;
         system(comando.c_str());
-        comando = "./LEER-DATOS" + name; 
+        comando = "./" + name; 
         system(comando.c_str());
         cout << "finalizo LEER-DATOS" << name << endl;
     auto fin = high_resolution_clock::now();
