@@ -28,6 +28,9 @@ Ensayo de 3–5 páginas con:
 
 - Comparación con un caso real investigado por ellos (ejemplo: sistemas de reservas como Amadeus, Sabre, o Despegar).
 
+## SOLUCION
+Para ver la solucion dirijase al siguiente [enlace del repositorio](/taller_1/SOLUCION_TALLER.md)
+
 ---
 
 ## Caso de estudio 2
@@ -76,4 +79,7 @@ Un documento breve (1–2 páginas) donde:
 - Comparen tiempos de ejecución.
 
 - Reflexionen sobre qué tipo de problemas sí se benefician de paralelismo y cuáles no.
+
+## SOLUCION
+Para ver la solucion dirijase al siguiente [enlace del repositorio](/taller_2/SOLUCION_TALLER_2.md)
 

@@ -344,3 +344,5 @@ adecuado de condiciones de carrera garantiza la consistencia y confiabilidad del
 La combinación de estas técnicas permite desarrollar sistemas escalables, eficientes y seguros. Los sistemas reales como Amadeus, 
 Sabre y Despegar ya implementan estas estrategias, lo que demuestra la importancia de la computación paralela y distribuida en
 aplicaciones empresariales de gran escala.
+
+# [VOLVER A README](/README.md)
