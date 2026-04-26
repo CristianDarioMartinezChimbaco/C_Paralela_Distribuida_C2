@@ -1,4 +1,4 @@
-# Solucion 
+# Solucion parte 1
 ## 1. ¿Cómo se podría paralelizar el procesamiento de los píxeles usando bucles paralelos?
 
 El procesamiento puede paralelizarse dividiendo la imagen en bloques o filas y asignando cada parte a diferentes 
@@ -90,7 +90,7 @@ total_local = 0;
 
 ---
 
-Conclusión
+## Conclusión
 
 El procesamiento puede paralelizarse dividiendo la imagen en filas o bloques
 
@@ -99,3 +99,9 @@ La distribución dinámica es más eficiente si el cómputo varía
 Existen riesgos de condiciones de carrera al usar variables globales
 
 El determinismo se garantiza usando reducción o variables locales
+
+# Solucion parte 2
+
+![Diagrama1](/images/diagrama1.jpg)
+
+# [VOLVER A README](/README.md)
