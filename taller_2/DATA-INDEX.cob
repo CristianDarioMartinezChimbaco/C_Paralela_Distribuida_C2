@@ -56,12 +56,19 @@
       ******************************************************************
        PROCEDURE DIVISION.
        DISPLAY "WELCOME TO DATA-INDEX PROGRAM".
+       PERFORM P006-INITIALIZE-MESSAGE.
        PERFORM 5000 TIMES
+           DISPLAY "P003-OPEN-DATA-FILE-01"
            PERFORM P003-OPEN-DATA-FILE-01
-           PERFORM P004-CONFIRM-CREATED-DATA    
+           DISPLAY "P004-CONFIRM-CREATED-DATA"
+           PERFORM P004-CONFIRM-CREATED-DATA  
+           DISPLAY "P005-CONFIRM-CONTINUE"  
            PERFORM P005-CONFIRM-CONTINUE
+           DISPLAY "P003-OPEN-DATA-FILE-02"
            PERFORM P003-OPEN-DATA-FILE-02
+           DISPLAY "P004-CONFIRM-CREATED-DATA"
            PERFORM P004-CONFIRM-CREATED-DATA
+           DISPLAY "P005-CONFIRM-CONTINUE"
            PERFORM P005-CONFIRM-CONTINUE  
        END-PERFORM.    
        STOP RUN.   
@@ -76,73 +83,93 @@
       *    P002-CREATE-DATA
       ******************************************************************
        P002-CREATE-DATA.
-           INITIALIZE WS-OUT-DATA-REC
-           MOVE 10.00 TO MULTIPLICATOR
-           PERFORM P001-GENERATE-RAMDOM
-           MOVE NUM-RAND TO TEMPERATURE
-           PERFORM P001-GENERATE-RAMDOM
-           MOVE NUM-RAND TO HUMIDITY
-           MOVE 100.00 TO MULTIPLICATOR
-           PERFORM P001-GENERATE-RAMDOM
-           MOVE NUM-RAND TO CO2
-           MULTIPLY TEMPERATURE BY 0.4 GIVING TEMPERATURE 
+       INITIALIZE WS-OUT-DATA-REC
+       MOVE 10.00 TO MULTIPLICATOR
+       PERFORM P001-GENERATE-RAMDOM
+       MOVE NUM-RAND TO TEMPERATURE
+       PERFORM P001-GENERATE-RAMDOM
+       MOVE NUM-RAND TO HUMIDITY
+       MOVE 100.00 TO MULTIPLICATOR
+       PERFORM P001-GENERATE-RAMDOM
+       MOVE NUM-RAND TO CO2
+       MULTIPLY TEMPERATURE BY 0.4 GIVING TEMPERATURE 
        .   
       ******************************************************************
       *    P003-OPEN-DATA-FILE-01
       ******************************************************************    
        P003-OPEN-DATA-FILE-01.
-       OPEN OUTPUT OUTPUT-DATA-IND-01
-           IF WS-STATUS-01 = "00"    
-               PERFORM 100 TIMES 
-                   PERFORM P002-CREATE-DATA
-                   MOVE WS-OUT-DATA-REC TO FD-OUT-DATA-REC-01
-                   WRITE FD-OUT-DATA-REC-01  
-               END-PERFORM 
-           ELSE
-               PERFORM P003-OPEN-DATA-FILE-01            
-           END-IF        
-       CLOSE OUTPUT-DATA-IND-01
+       PERFORM UNTIL WS-STATUS-01 = "00" 
+           OPEN OUTPUT OUTPUT-DATA-IND-01
+       END-PERFORM    
+       IF WS-STATUS-01 = "00"    
+           PERFORM 100 TIMES 
+               PERFORM P002-CREATE-DATA
+               MOVE WS-OUT-DATA-REC TO FD-OUT-DATA-REC-01
+               WRITE FD-OUT-DATA-REC-01  
+           END-PERFORM   
+           CLOSE OUTPUT-DATA-IND-01       
+       END-IF     
+      *INITIALIZE WS-STATUS-01   
        .
       ******************************************************************
       *    P003-OPEN-DATA-FILE-02
       ******************************************************************
        P003-OPEN-DATA-FILE-02.
-       OPEN OUTPUT OUTPUT-DATA-IND-02
-           IF WS-STATUS-02 = "00"
-               PERFORM 100 TIMES 
-                   PERFORM P002-CREATE-DATA
-                   MOVE WS-OUT-DATA-REC TO FD-OUT-DATA-REC-02
-                   WRITE FD-OUT-DATA-REC-02  
-               END-PERFORM
-           ELSE
-               PERFORM P003-OPEN-DATA-FILE-02            
-           END-IF 
-       CLOSE OUTPUT-DATA-IND-02
+       PERFORM UNTIL WS-STATUS-02 = "00" 
+           OPEN OUTPUT OUTPUT-DATA-IND-02
+       END-PERFORM
+       IF WS-STATUS-02 = "00"
+           PERFORM 100 TIMES 
+               PERFORM P002-CREATE-DATA
+               MOVE WS-OUT-DATA-REC TO FD-OUT-DATA-REC-02
+               WRITE FD-OUT-DATA-REC-02  
+           END-PERFORM    
+           CLOSE OUTPUT-DATA-IND-02       
+       END-IF      
+      *INITIALIZE WS-STATUS-02  
        .
       ******************************************************************
       *    P004-CONFIRM-CREATED-DATA
       ******************************************************************
        P004-CONFIRM-CREATED-DATA.
-       MOVE 'Y' TO WS-MESSAGE-REC 
-       OPEN OUTPUT MESSAGE-PROGRAM   
-           IF WS-STATUS-MSG = "00"    
-               WRITE FD-MESSAGE-REC FROM WS-MESSAGE-REC
-           ELSE
-               PERFORM P004-CONFIRM-CREATED-DATA            
-           END-IF
-       CLOSE MESSAGE-PROGRAM
+       PERFORM UNTIL WS-STATUS-MSG = "00"  
+           OPEN OUTPUT MESSAGE-PROGRAM 
+       END-PERFORM  
+       IF WS-STATUS-MSG = "00"  
+           MOVE 'Y' TO WS-MESSAGE-REC  
+           WRITE FD-MESSAGE-REC FROM WS-MESSAGE-REC     
+           CLOSE MESSAGE-PROGRAM                   
+       END-IF       
+      *INITIALIZE WS-STATUS-MSG  
        .
       ******************************************************************
       *    P005-CONFIRM-CONTINUE
       ******************************************************************       
        P005-CONFIRM-CONTINUE.
-       PERFORM UNTIL WS-MESSAGE-REC = 'N'
-           OPEN INPUT MESSAGE-PROGRAM
-               IF WS-STATUS-MSG = "00" 
-                   READ MESSAGE-PROGRAM INTO WS-MESSAGE-REC
-               ELSE
-                   PERFORM P005-CONFIRM-CONTINUE            
-               END-IF         
-           CLOSE MESSAGE-PROGRAM
-       END-PERFORM  
+      *PERFORM UNTIL WS-STATUS-MSG = "00" AND WS-MESSAGE-REC = 'N' 
+       MOVE ' ' TO WS-MESSAGE-REC
+       PERFORM UNTIL WS-MESSAGE-REC = 'N'                
+           OPEN INPUT MESSAGE-PROGRAM            
+           IF WS-STATUS-MSG = "00" 
+               READ MESSAGE-PROGRAM INTO WS-MESSAGE-REC WITH LOCK
+               CLOSE MESSAGE-PROGRAM                    
+           END-IF
+           CALL "sleep" USING 1   
+       END-PERFORM     
+      *INITIALIZE WS-STATUS-MSG  
        .
+      ******************************************************************
+      *    P006-INITIALIZE-MESSAGE
+      ******************************************************************  
+       P006-INITIALIZE-MESSAGE.  
+       PERFORM UNTIL WS-STATUS-MSG = "00"     
+           OPEN OUTPUT MESSAGE-PROGRAM 
+       END-PERFORM
+       IF WS-STATUS-MSG = "00" 
+           MOVE 'N' TO WS-MESSAGE-REC       
+           WRITE FD-MESSAGE-REC FROM WS-MESSAGE-REC                   
+           CLOSE MESSAGE-PROGRAM                        
+       END-IF 
+       .  
+
+       

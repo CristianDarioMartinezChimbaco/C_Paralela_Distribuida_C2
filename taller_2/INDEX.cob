@@ -65,67 +65,109 @@
       ******************************************************************
        PROCEDURE DIVISION.
        DISPLAY "WELCOME TO INDEX PROGRAM".
-       OPEN OUTPUT OUTPUT-DATA-TOTAL
-           PERFORM 5000 TIMES
-               DISPLAY 'STARTED P003-CONFIRM-CONTINUE'     
-               PERFORM P003-CONFIRM-CONTINUE   
-               DISPLAY 'STARTED P004-CONFIRM-MESSAGE-RECEIVED'        
-               PERFORM P004-CONFIRM-MESSAGE-RECEIVED
-               DISPLAY 'STARTED P001-READ-FILE-DATA-01'   
-               PERFORM P001-READ-FILE-DATA-01  
-               DISPLAY 'STARTED P003-CONFIRM-CONTINUE'   
-               PERFORM P003-CONFIRM-CONTINUE  
-               DISPLAY 'STARTED P004-CONFIRM-MESSAGE-RECEIVED'   
-               PERFORM P004-CONFIRM-MESSAGE-RECEIVED
-               DISPLAY 'STARTED P001-READ-FILE-DATA-02'   
-               PERFORM P001-READ-FILE-DATA-02           
-           END-PERFORM
+       OPEN OUTPUT OUTPUT-DATA-TOTAL 
+           IF WS-STATUS-DTL = "00"           
+               PERFORM 5000 TIMES
+                   DISPLAY "P003-CONFIRM-CONTINUE"     
+                   PERFORM P003-CONFIRM-CONTINUE   
+                   DISPLAY "P004-CONFIRM-MESSAGE-RECEIVED"        
+                   PERFORM P004-CONFIRM-MESSAGE-RECEIVED
+                   DISPLAY "P001-READ-FILE-DATA-01"   
+                   PERFORM P001-READ-FILE-DATA-01  
+                   DISPLAY "P003-CONFIRM-CONTINUE"   
+                   PERFORM P003-CONFIRM-CONTINUE  
+                   DISPLAY "P004-CONFIRM-MESSAGE-RECEIVED"   
+                   PERFORM P004-CONFIRM-MESSAGE-RECEIVED
+                   DISPLAY "P001-READ-FILE-DATA-02"   
+                   PERFORM P001-READ-FILE-DATA-02           
+               END-PERFORM
+           ELSE
+               DISPLAY "ERROR OPEN TDL FILE ", WS-STATUS-DTL            
+           END-IF      
        CLOSE OUTPUT-DATA-TOTAL.    
-       STOP RUN.   
+       STOP RUN. 
+      ****************************************************************** 
+      *    P001-READ-FILE-DATA-01.
+      ******************************************************************   
        P001-READ-FILE-DATA-01.
-       OPEN INPUT INPUT-DATA-IND-01
+       PERFORM UNTIL WS-STATUS-01 = "00" 
+           OPEN INPUT INPUT-DATA-IND-01
+       END-PERFORM
+       IF WS-STATUS-01 = "00" 
            PERFORM UNTIL EOF = 'T'
                READ INPUT-DATA-IND-01 INTO WS-IN-OUT-DATA-REC
                    AT END
                        MOVE 'T' TO EOF
                    NOT AT END
                        PERFORM P002-CALCULATE-INDEX
-                       WRITE FD-OUT-TOTAL-REC FROM WS-IN-OUT-DATA-REC
+                     MOVE WS-IN-OUT-DATA-REC TO FD-OUT-TOTAL-REC
+                       WRITE FD-OUT-TOTAL-REC
                END-READ                        
-           END-PERFORM     
-           INITIALIZE EOF                     
-       CLOSE INPUT-DATA-IND-01
+           END-PERFORM
+           INITIALIZE EOF   
+           CLOSE INPUT-DATA-IND-01       
+       END-IF
+      *INITIALIZE WS-STATUS-01
        .
+      ****************************************************************** 
+      *    P001-READ-FILE-DATA-02.
+      ******************************************************************  
        P001-READ-FILE-DATA-02.
-       OPEN INPUT INPUT-DATA-IND-02
+       PERFORM UNTIL WS-STATUS-02 = "00" 
+           OPEN INPUT INPUT-DATA-IND-02
+       END-PERFORM
+       IF WS-STATUS-02 = "00" 
            PERFORM UNTIL EOF = 'T'
                READ INPUT-DATA-IND-02 INTO WS-IN-OUT-DATA-REC
                    AT END
                        MOVE 'T' TO EOF
                    NOT AT END
                        PERFORM P002-CALCULATE-INDEX
-                       WRITE FD-OUT-TOTAL-REC FROM WS-IN-OUT-DATA-REC
+                     MOVE WS-IN-OUT-DATA-REC TO FD-OUT-TOTAL-REC
+                       WRITE FD-OUT-TOTAL-REC
                END-READ   
-           END-PERFORM     
-           INITIALIZE EOF                     
-       CLOSE INPUT-DATA-IND-02
+           END-PERFORM 
+           INITIALIZE EOF 
+           CLOSE INPUT-DATA-IND-02         
+       END-IF 
+      *INITIALIZE WS-STATUS-02
        .
+      ****************************************************************** 
+      *    P002-CALCULATE-INDEX.
+      ******************************************************************
        P002-CALCULATE-INDEX.
        COMPUTE INDEX-NUM = (TEMPERATURE * 0.4)
                   + (HUMIDITY * 0.3)
                   + (CO2 * 0.3)
        END-COMPUTE
        .  
+      ****************************************************************** 
+      *    P003-CONFIRM-CONTINUE.
+      ****************************************************************** 
        P003-CONFIRM-CONTINUE.
+      *PERFORM UNTIL WS-STATUS-MSG = "00" AND WS-MESSAGE-REC = 'Y'
+       MOVE ' ' TO WS-MESSAGE-REC
        PERFORM UNTIL WS-MESSAGE-REC = 'Y'
-           OPEN INPUT MESSAGE-PROGRAM
-               READ MESSAGE-PROGRAM INTO WS-MESSAGE-REC
-           CLOSE MESSAGE-PROGRAM
-       END-PERFORM  
+           OPEN INPUT MESSAGE-PROGRAM       
+           IF WS-STATUS-MSG = "00" 
+               READ MESSAGE-PROGRAM INTO WS-MESSAGE-REC WITH LOCK  
+               CLOSE MESSAGE-PROGRAM                        
+           END-IF  
+           CALL "sleep" USING 1
+       END-PERFORM
+      *INITIALIZE WS-STATUS-MSG
        .
-       P004-CONFIRM-MESSAGE-RECEIVED.
-       MOVE 'N' TO WS-MESSAGE-REC 
-       OPEN OUTPUT MESSAGE-PROGRAM       
-           WRITE FD-MESSAGE-REC FROM WS-MESSAGE-REC
-       CLOSE MESSAGE-PROGRAM
+      ****************************************************************** 
+      *    P004-CONFIRM-MESSAGE-RECEIVED.
+      ******************************************************************
+       P004-CONFIRM-MESSAGE-RECEIVED.  
+       PERFORM UNTIL WS-STATUS-MSG = "00"     
+           OPEN OUTPUT MESSAGE-PROGRAM 
+       END-PERFORM
+       IF WS-STATUS-MSG = "00" 
+           MOVE 'N' TO WS-MESSAGE-REC       
+           WRITE FD-MESSAGE-REC FROM WS-MESSAGE-REC                   
+           CLOSE MESSAGE-PROGRAM                        
+       END-IF        
+      *INITIALIZE WS-STATUS-MSG
        . 
