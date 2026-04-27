@@ -23,33 +23,17 @@ void leerDatosCobol(string name){
         system(comando.c_str());
         comando = "./" + name; 
         system(comando.c_str());
-        cout << "finalizo LEER-DATOS" << name << endl;
+        cout << "finalizo " << name << endl;
     auto fin = high_resolution_clock::now();
     auto duracion = duration_cast<milliseconds>(fin - inicio);
     cout << "Tiempo: " << duracion.count() << " ms" << endl;
 }
 
 int main() {
-    thread crearDatosCobol0(crearDatosCobol,"0");
-    thread crearDatosCobol1(crearDatosCobol,"1");
-    thread crearDatosCobol2(crearDatosCobol,"2");
-    thread crearDatosCobol3(crearDatosCobol,"3");
-    thread crearDatosCobol4(crearDatosCobol,"4");
+    thread crearDatosCobol0(crearDatosCobol,"DATA-INDEX");
+    thread crearDatosCobol1(leerDatosCobol,"INDEX");    
     crearDatosCobol0.join();
     crearDatosCobol1.join();
-    crearDatosCobol2.join();
-    crearDatosCobol3.join();
-    crearDatosCobol4.join();
-    cout << "Termino La creacion de todos los datos" << endl;
-    thread leerDatosCobol0(leerDatosCobol,"0");
-    thread leerDatosCobol1(leerDatosCobol,"1");
-    thread leerDatosCobol2(leerDatosCobol,"2");
-    thread leerDatosCobol3(leerDatosCobol,"3");
-    thread leerDatosCobol4(leerDatosCobol,"4");
-    leerDatosCobol0.join();
-    leerDatosCobol1.join();
-    leerDatosCobol2.join();
-    leerDatosCobol3.join();
-    leerDatosCobol4.join();
+    cout << "Termino La creacion de todos los datos" << endl;  
     return 0;
 }

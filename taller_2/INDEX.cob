@@ -2,17 +2,21 @@
        PROGRAM-ID. INDEX.
        AUTHOR. CRISTIAN MCH.
       ****************************************************************** 
-      *    ENVIRONMENT DIVISION.
+      *    ENVIRONMENT DIVISION
       ******************************************************************  
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT OUT-DATA-TOTAL ASSIGN TO DATA-TOTAL.
-           SELECT INPUT-DATA-IND-01 ASSIGN TO DATA-FILE-01.
-           SELECT INPUT-DATA-IND-02 ASSIGN TO DATA-FILE-02.
-           SELECT MESSAGE-PROGRAM ASSIGN TO MESAGGE.        
+           SELECT OUTPUT-DATA-TOTAL ASSIGN TO DATA-TOTAL
+               FILE STATUS IS WS-STATUS-DTL.
+           SELECT INPUT-DATA-IND-01 ASSIGN TO DATA-FILE-01
+               FILE STATUS IS WS-STATUS-01.
+           SELECT INPUT-DATA-IND-02 ASSIGN TO DATA-FILE-02
+               FILE STATUS IS WS-STATUS-02.
+           SELECT MESSAGE-PROGRAM ASSIGN TO MESAGGE
+               FILE STATUS IS WS-STATUS-MSG.        
       ****************************************************************** 
-      *    DATA DIVISION.
+      *    DATA DIVISION
       ******************************************************************  
        DATA DIVISION.
        FILE SECTION.
@@ -23,16 +27,27 @@
        01 FD-OUT-TOTAL-REC     PIC X(50). 
        FD INPUT-DATA-IND-01
            RECORDING MODE IS F
-           RECORD CONTAINS 50 CHARACTERS             
+           RECORD CONTAINS 50 CHARACTERS
+           DATA RECORD IS FD-OUT-DATA-REC-01. 
+       01 FD-OUT-DATA-REC-01   PIC X(50).            
        FD INPUT-DATA-IND-02
            RECORDING MODE IS F
            RECORD CONTAINS 50 CHARACTERS
+           DATA RECORD IS FD-OUT-DATA-REC-02.
+       01 FD-OUT-DATA-REC-02   PIC X(50).
        FD MESSAGE-PROGRAM
            RECORDING MODE IS F
            RECORD CONTAINS 1 CHARACTERS
            DATA RECORD IS FD-MESSAGE-REC.
        01 FD-MESSAGE-REC       PIC X(01).
-       WORKING-STORAGE SECTION.   
+      ****************************************************************** 
+      *    WORKING-STORAGE SECTION
+      ******************************************************************   
+       WORKING-STORAGE SECTION.
+       01 WS-STATUS-DTL        PIC XX.   
+       01 WS-STATUS-01         PIC XX.
+       01 WS-STATUS-02         PIC XX.
+       01 WS-STATUS-MSG        PIC XX.
        01 EOF                  PIC X(01) VALUE 'F'.   
        01 WS-IN-OUT-DATA-REC.
            02 FILLER           PIC X(12) VALUE 'TEMPERATURE '.
@@ -49,11 +64,23 @@
       *    PROCEDURE DIVISION.
       ******************************************************************
        PROCEDURE DIVISION.
-       PERFORM 5000 TIMES
-           OPEN OUTPUT OUTPUT-DATA-TOTAL
-               PERFORM P001-READ-FILE-DATA-01 
-           CLOSE OUTPUT-DATA-TOTAL
-       END-PERFORM.    
+       DISPLAY "WELCOME TO INDEX PROGRAM".
+       OPEN OUTPUT OUTPUT-DATA-TOTAL
+           PERFORM 5000 TIMES
+               DISPLAY 'STARTED P003-CONFIRM-CONTINUE'     
+               PERFORM P003-CONFIRM-CONTINUE   
+               DISPLAY 'STARTED P004-CONFIRM-MESSAGE-RECEIVED'        
+               PERFORM P004-CONFIRM-MESSAGE-RECEIVED
+               DISPLAY 'STARTED P001-READ-FILE-DATA-01'   
+               PERFORM P001-READ-FILE-DATA-01  
+               DISPLAY 'STARTED P003-CONFIRM-CONTINUE'   
+               PERFORM P003-CONFIRM-CONTINUE  
+               DISPLAY 'STARTED P004-CONFIRM-MESSAGE-RECEIVED'   
+               PERFORM P004-CONFIRM-MESSAGE-RECEIVED
+               DISPLAY 'STARTED P001-READ-FILE-DATA-02'   
+               PERFORM P001-READ-FILE-DATA-02           
+           END-PERFORM
+       CLOSE OUTPUT-DATA-TOTAL.    
        STOP RUN.   
        P001-READ-FILE-DATA-01.
        OPEN INPUT INPUT-DATA-IND-01
@@ -64,7 +91,7 @@
                    NOT AT END
                        PERFORM P002-CALCULATE-INDEX
                        WRITE FD-OUT-TOTAL-REC FROM WS-IN-OUT-DATA-REC
-               END-READ   
+               END-READ                        
            END-PERFORM     
            INITIALIZE EOF                     
        CLOSE INPUT-DATA-IND-01
@@ -87,6 +114,18 @@
        COMPUTE INDEX-NUM = (TEMPERATURE * 0.4)
                   + (HUMIDITY * 0.3)
                   + (CO2 * 0.3)
-       END-COMPUTE.
-       .     
-
+       END-COMPUTE
+       .  
+       P003-CONFIRM-CONTINUE.
+       PERFORM UNTIL WS-MESSAGE-REC = 'Y'
+           OPEN INPUT MESSAGE-PROGRAM
+               READ MESSAGE-PROGRAM INTO WS-MESSAGE-REC
+           CLOSE MESSAGE-PROGRAM
+       END-PERFORM  
+       .
+       P004-CONFIRM-MESSAGE-RECEIVED.
+       MOVE 'N' TO WS-MESSAGE-REC 
+       OPEN OUTPUT MESSAGE-PROGRAM       
+           WRITE FD-MESSAGE-REC FROM WS-MESSAGE-REC
+       CLOSE MESSAGE-PROGRAM
+       . 
